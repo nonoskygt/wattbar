@@ -23,6 +23,7 @@ class WattBar(QtWidgets.QWidget):
         self.on_moved = None          # callback() tras arrastrar, para persistir posición
         self._drag_offset = None
 
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating, True)
 
         self._label = QtWidgets.QLabel(self)
@@ -135,8 +136,16 @@ class WattBar(QtWidgets.QWidget):
     # ---- fondo OPACO (rectángulo oscuro que combina con la barra) ----
     def paintEvent(self, event):
         c = self.cfg["colors"]
+        alpha = int(c.get("bg_alpha", 0))
+        if alpha <= 0:
+            return  # fondo totalmente transparente: se ve solo el texto sobre la barra
+        col = QtGui.QColor(c["bg"])
+        col.setAlpha(alpha)
         p = QtGui.QPainter(self)
-        p.fillRect(self.rect(), QtGui.QColor(c["bg"]))
+        p.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        p.setPen(QtCore.Qt.NoPen)
+        p.setBrush(col)
+        p.drawRoundedRect(QtCore.QRectF(self.rect()), 7.0, 7.0)
         p.end()
 
     # ---- arrastre (solo en modo flotante) y menú ----
@@ -144,12 +153,12 @@ class WattBar(QtWidgets.QWidget):
         if e.button() == QtCore.Qt.RightButton and self.menu_callback:
             self.menu_callback(e.globalPosition().toPoint())
             return
-        if e.button() == QtCore.Qt.LeftButton and self.cfg.get("mode") == "floating":
+        if e.button() == QtCore.Qt.LeftButton:
             self._drag_offset = e.globalPosition().toPoint() - self.frameGeometry().topLeft()
             e.accept()
 
     def mouseMoveEvent(self, e):
-        if self._drag_offset is not None and self.cfg.get("mode") == "floating":
+        if self._drag_offset is not None:
             self.move(e.globalPosition().toPoint() - self._drag_offset)
             e.accept()
 

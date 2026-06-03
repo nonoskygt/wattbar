@@ -36,8 +36,8 @@ DEFAULTS = {
         "value": "#e6e6e6",        # valores
         "temp": "#ff9d5c",         # temperaturas (naranja)
         "warn": "#ff4d4d",         # resaltado alto uso
-        "bg": "#0c0e14",           # fondo opaco
-        "bg_alpha": 200,           # (compatibilidad)
+        "bg": "#0c0e14",           # color del fondo (si bg_alpha > 0)
+        "bg_alpha": 0,             # 0 = transparente total · 1-255 = caja semitransparente
         "accent": "#ff3df0",       # magenta (el rayo)
     },
 }

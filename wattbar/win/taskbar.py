@@ -42,6 +42,16 @@ def _clamp(x, y, w, h, g):
     return int(x), int(y)
 
 
+def _band_y(screen, h):
+    """Y para centrar la tira (alto `h`) dentro de la franja de la barra de tareas."""
+    g = screen.geometry()
+    a = screen.availableGeometry()
+    band_h = g.bottom() - a.bottom()
+    if band_h > 4:
+        return a.bottom() + 1 + max(0, (band_h - h) // 2)
+    return g.bottom() - h
+
+
 def place_floating(widget, cfg):
     """Posiciona la tira según el modo, en coordenadas LÓGICAS de Qt (DPI-correctas).
 
@@ -65,15 +75,20 @@ def place_floating(widget, cfg):
     w = widget.width() or 320
     h = widget.height() or 28
 
-    # --- Modo integrado: dentro de la barra de tareas, a la derecha ---
+    # --- Modo integrado: dentro de la barra; X arrastrable, Y fija a la franja ---
     if cfg.get("mode", "taskbar") == "taskbar":
-        band_h = g.bottom() - a.bottom()          # alto de la barra de tareas
-        if band_h > 4:
-            y_pos = a.bottom() + 1 + max(0, (band_h - h) // 2)
+        x = cfg.get("pos_x")
+        if x is not None:
+            # monitor cuya barra de tareas contiene la X elegida (multi-monitor)
+            center = QPoint(int(x) + w // 2, _band_y(screen, h) + h // 2)
+            target = QGuiApplication.screenAt(center) or screen
         else:
-            y_pos = g.bottom() - h                 # sin barra abajo: pegado al fondo
-        x_pos = g.right() - w - _RESERVE_RIGHT_LOGICAL
-        widget.move(*_clamp(x_pos, y_pos, w, h, g))
+            target = screen
+        tg = target.geometry()
+        y_pos = _band_y(target, h)
+        if x is None:
+            x = tg.right() - w - _RESERVE_RIGHT_LOGICAL
+        widget.move(*_clamp(x, y_pos, w, h, tg))
         return
 
     # --- Modo flotante: posición guardada (arrastrable) o esquina inferior derecha ---

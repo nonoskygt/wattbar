@@ -17,7 +17,7 @@ class SettingsDialog(QtWidgets.QDialog):
         form = QtWidgets.QFormLayout(self)
 
         self.mode = QtWidgets.QComboBox()
-        self.mode.addItem("Integrado en la barra (como Traffic Monitor)", "taskbar")
+        self.mode.addItem("Integrado en la barra", "taskbar")
         self.mode.addItem("Flotante (arrastrable, libre)", "floating")
         self.mode.setCurrentIndex(max(0, self.mode.findData(self.cfg.get("mode", "taskbar"))))
         form.addRow("Modo:", self.mode)
