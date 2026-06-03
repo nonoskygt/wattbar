@@ -11,7 +11,7 @@ CONFIG_DIR = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), AP
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
 
 DEFAULTS = {
-    "mode": "floating",            # "floating" | "embedded"
+    "mode": "taskbar",             # "taskbar" (integrado) | "floating"
     "pos_x": None,                 # None => auto-posicionar sobre la barra de tareas
     "pos_y": None,
     "font_size": 11,

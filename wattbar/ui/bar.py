@@ -144,12 +144,12 @@ class WattBar(QtWidgets.QWidget):
         if e.button() == QtCore.Qt.RightButton and self.menu_callback:
             self.menu_callback(e.globalPosition().toPoint())
             return
-        if e.button() == QtCore.Qt.LeftButton:
+        if e.button() == QtCore.Qt.LeftButton and self.cfg.get("mode") == "floating":
             self._drag_offset = e.globalPosition().toPoint() - self.frameGeometry().topLeft()
             e.accept()
 
     def mouseMoveEvent(self, e):
-        if self._drag_offset is not None:
+        if self._drag_offset is not None and self.cfg.get("mode") == "floating":
             self.move(e.globalPosition().toPoint() - self._drag_offset)
             e.accept()
 

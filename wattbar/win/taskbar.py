@@ -11,7 +11,7 @@ from PySide6.QtCore import QPoint
 
 TASKBAR_CLASS = "Shell_TrayWnd"
 _RESERVE_RIGHT = 240          # px FÍSICOS libres a la derecha (modo empotrado)
-_RESERVE_RIGHT_LOGICAL = 180  # px LÓGICOS libres a la derecha (modo flotante)
+_RESERVE_RIGHT_LOGICAL = 220  # px LÓGICOS libres a la derecha (reloj/bandeja)
 
 
 def find_taskbar():
@@ -43,14 +43,17 @@ def _clamp(x, y, w, h, g):
 
 
 def place_floating(widget, cfg):
-    """Posiciona la tira sobre la barra de tareas en coordenadas LÓGICAS de Qt.
+    """Posiciona la tira según el modo, en coordenadas LÓGICAS de Qt (DPI-correctas).
 
-    QWidget.move() usa píxeles lógicos (independientes de DPI). La franja de la barra
-    se deriva de QScreen (no de Win32, que devuelve píxeles físicos); de lo contrario,
-    con escalado != 100 % la ventana queda desplazada y se va fuera de pantalla.
+    - "taskbar" (integrado, estilo Traffic Monitor): metida DENTRO de la franja de la
+      barra de tareas (centrada vertical), del lado derecho antes de la bandeja. Fija.
+    - "floating": ventana libre, posición guardada/arrastrable o esquina inferior derecha.
+
+    La franja se deriva de QScreen (no de Win32, que da píxeles físicos); con escalado
+    != 100 % o multi-monitor, usar coordenadas físicas tira la ventana a la zona muerta.
     """
     screen = _screen_of(widget)
-    # Fijar la ventana a ESTE monitor (evita zona muerta y problemas de DPI mixto).
+    # Fijar la ventana a ESTE monitor (evita zona muerta y DPI mixto).
     wh = widget.windowHandle()
     if wh is not None:
         try:
@@ -62,17 +65,24 @@ def place_floating(widget, cfg):
     w = widget.width() or 320
     h = widget.height() or 28
 
+    # --- Modo integrado: dentro de la barra de tareas, a la derecha ---
+    if cfg.get("mode", "taskbar") == "taskbar":
+        band_h = g.bottom() - a.bottom()          # alto de la barra de tareas
+        if band_h > 4:
+            y_pos = a.bottom() + 1 + max(0, (band_h - h) // 2)
+        else:
+            y_pos = g.bottom() - h                 # sin barra abajo: pegado al fondo
+        x_pos = g.right() - w - _RESERVE_RIGHT_LOGICAL
+        widget.move(*_clamp(x_pos, y_pos, w, h, g))
+        return
+
+    # --- Modo flotante: posición guardada (arrastrable) o esquina inferior derecha ---
     x, y = cfg.get("pos_x"), cfg.get("pos_y")
     if x is not None and y is not None:
-        # Respetar el monitor donde está la ventana (multi-monitor): clampar al
-        # monitor que contiene su centro, no siempre al primario.
         center = QPoint(int(x) + w // 2, int(y) + h // 2)
         target = QGuiApplication.screenAt(center) or screen
         widget.move(*_clamp(x, y, w, h, target.geometry()))
         return
-
-    # Esquina inferior derecha del área visible (justo arriba de la barra),
-    # SIEMPRE dentro del monitor para que no caiga en zona muerta.
     x_pos = a.right() - w - 8
     y_pos = a.bottom() - h - 2
     widget.move(*_clamp(x_pos, y_pos, w, h, a))

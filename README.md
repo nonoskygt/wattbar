@@ -73,9 +73,12 @@ pythonw run.pyw
 ```
 
 - **Clic derecho** en la tira (o en el ícono ⚡ de la bandeja) → **Configuración**:
-  elegí 1/2 líneas, qué campos mostrar, tamaño de fuente, ocultar en pantalla completa
-  e **Iniciar con Windows**.
-- **Arrastrá** la tira para moverla a cualquier monitor; recuerda la posición.
+  elegí el **modo**, 1/2 líneas, qué campos mostrar, tamaño de fuente, ocultar en
+  pantalla completa e **Iniciar con Windows**.
+- **Dos modos:**
+  - **Integrado en la barra** (estilo *Traffic Monitor*): la tira va dentro de la
+    franja de la barra de tareas, a la derecha. Posición fija.
+  - **Flotante**: ventana libre, **arrastrable** a cualquier monitor (recuerda la posición).
 - Se **oculta sola** cuando una app va a pantalla completa (juegos / video).
 
 ## ⚙️ Configuración
@@ -102,8 +105,9 @@ Cada sensor es tolerante a fallos: si una fuente no está, devuelve `--` sin tir
   ni sale energía de la batería). El consumo total directo solo se mide a batería;
   enchufado se estima con CPU+GPU reales + base calibrada.
 - **Windows 11:** su barra de tareas es XAML y no admite incrustar ventanas de otras
-  apps. WattBar usa una tira flotante *always-on-top* posada sobre la barra — robusta y
-  compatible con setups multi-monitor (se re-ancla a su monitor en cada tick).
+  apps vía `SetParent` (la ventana termina fuera de pantalla). Por eso el modo
+  *integrado en la barra* se logra con una tira flotante *always-on-top* posicionada
+  dentro de la franja de la barra: se ve igual, es robusto y multi-monitor.
 
 ## 🧪 Tests
 

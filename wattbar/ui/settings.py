@@ -16,6 +16,12 @@ class SettingsDialog(QtWidgets.QDialog):
     def _build(self):
         form = QtWidgets.QFormLayout(self)
 
+        self.mode = QtWidgets.QComboBox()
+        self.mode.addItem("Integrado en la barra (como Traffic Monitor)", "taskbar")
+        self.mode.addItem("Flotante (arrastrable, libre)", "floating")
+        self.mode.setCurrentIndex(max(0, self.mode.findData(self.cfg.get("mode", "taskbar"))))
+        form.addRow("Modo:", self.mode)
+
         self.lines = QtWidgets.QComboBox()
         self.lines.addItem("1 línea", 1)
         self.lines.addItem("2 líneas", 2)
@@ -62,6 +68,7 @@ class SettingsDialog(QtWidgets.QDialog):
         form.addRow(btns)
 
     def _accept(self):
+        self.cfg["mode"] = self.mode.currentData()
         self.cfg["lines"] = int(self.lines.currentData())
         self.cfg["show"]["consumo"] = self.chk_consumo.isChecked()
         self.cfg["show"]["vram"] = self.chk_vram.isChecked()
