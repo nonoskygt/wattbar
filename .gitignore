@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Lanzador local (ruta de Python específica de la máquina)
+WattBar.cmd
+
+# Diagnósticos / temporales
+/_*.py
+_runtime.log
+_stderr.txt
