@@ -14,3 +14,9 @@ WattBar.cmd
 /_*.py
 _runtime.log
 _stderr.txt
+
+# Artefactos de build del instalador (se versiona el .iss, make_icon.py y wattbar.ico)
+installer/build/
+installer/dist/
+installer/Output/
+installer/*.spec
