@@ -10,6 +10,9 @@ dist/
 # Lanzador local (ruta de Python específica de la máquina)
 WattBar.cmd
 
+# Memoria de proyecto para Claude (notas de dev locales; futuras sesiones la cargan)
+CLAUDE.md
+
 # Diagnósticos / temporales
 /_*.py
 _runtime.log
